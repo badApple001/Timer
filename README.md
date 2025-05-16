@@ -59,17 +59,17 @@ static long Delay(
     TimerTimeSource timeSource = TimerTimeSource.GameTime
 )
 ```
-功能：单次延迟执行
+- 功能：单次延迟执行
 
-参数：
+- 参数：
 
-delay：延迟时间(秒)
+    - delay：延迟时间(秒)
 
-callback：无参回调方法
+    - callback：无参回调方法
 
-timeSource：时间源类型
+    - timeSource：时间源类型
 
-Timer.Loop
+**Timer.Loop**
 ```csharp
 static long Loop(
     float interval,
@@ -78,16 +78,112 @@ static long Loop(
     bool immediate = false,
     int times = 0
 )
+```
+ - 参数：
 
-参数：
+     - immediate：是否立即执行第一次
 
-immediate：是否立即执行第一次
+     - times：执行次数(0=无限循环)
 
-times：执行次数(0=无限循环)
 
-2. 查找定时任务
-方法签名	返回类型	说明
-Find(long id)	TimerTask	通过任务ID查找
-Find(Action func)	List<TimerTask>	查找同回调的所有任务
-Find(object target)	List<TimerTask>	查找对象关联的所有任务
-3. 终止定时任务
+## 2. 查找定时任务
+
+| 方法签名             | 返回类型         | 说明                          |
+|----------------------|------------------|-------------------------------|
+| `Find(long id)`      | `TimerTask`      | 通过任务ID查找特定定时任务     |
+| `Find(Action func)`  | `List<TimerTask>`| 查找使用相同回调的所有定时任务 |
+| `Find(object target)`| `List<TimerTask>`| 查找对象关联的所有定时任务     |
+
+## 3. 终止定时任务方法
+
+| 方法签名             | 说明                          |
+|----------------------|-------------------------------|
+| `Kill(long id)`      | 终止指定ID的单个定时任务       |
+| `Kill(Action func)`  | 终止所有使用该回调的定时任务   |
+| `Kill(object target)`| 终止对象关联的所有定时任务     |
+| `KillAll()`          | 终止所有定时任务               |
+`` `
+## 4. 内部机制
+**架构设计**
+![Unity](./README/deepseek_mermaid_20250516_b5f57c.png)
+
+**关键优化**
+- 对象池：ConcurrentQueue实现任务复用
+
+- 双缓冲：避免遍历时修改冲突
+
+- 自动排序：按执行时间排序插入
+
+## 5.  注意事项
+**最佳实践**
+### 1. 避免在lambda中捕获复杂对象
+
+```csharp
+// 不推荐
+Timer.Delay(1f, () => Destroy(complexObj));
+
+// 推荐
+Timer.Delay(1f, DestroySimple);
+```
+
+### 2. RealTime使用场景：
+
+ - 后台计时
+
+ - 网络超时检测
+
+ - 需要跨暂停的场景
+
+# 示例代码
+## 完整使用案例
+```csharp
+public class Player : MonoBehaviour 
+{
+    private long _attackTimer;
+
+    void Start() {
+        // 5秒后开始攻击
+        _attackTimer = Timer.Delay(5f, StartAttack);
+    }
+
+    void StartAttack() {
+        // 每2秒攻击一次，共3次
+        Timer.Loop(2f, Attack, times: 3);
+    }
+
+    void Attack() {
+        Debug.Log("发动攻击！");
+    }
+
+    void OnDestroy() {
+        Timer.Kill(this); // 清理所有关联任务
+    }
+}
+```
+
+# 扩展建议
+## 推荐扩展方向
+1. 协程支持：
+
+```csharp
+Timer.DelayCoroutine(1f, MyCoroutine);
+```
+2. 参数化回调：
+
+```csharp
+Timer.Delay(1f, (arg) => {}, "参数");
+```
+## 下载与安装
+### 安装方式
+ - 1. 通过GitURL安装：
+    https://github.com/badApple001/Timer.git
+
+ - 2. 或导入UnityPackage：
+[下载链接](./Release/Timer.unitypackage)
+
+ - 3. 单元测试案例
+ [下载链接](./Release//TimerTest.unitypackage)
+
+## 技术支持
+- 联系作者：Isysprey@foxmail.com
+- 文档版本：v2.1.0
