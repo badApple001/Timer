@@ -34,18 +34,23 @@ public enum TimerTimeSource {
     UnscaledTime,  // Time.unscaledTime
     RealTime       // DateTimeOffset.UtcNow
 }
-快速开始
-延迟执行一个函数
-csharp
+```
+
+# 快速开始
+## 延迟执行一个函数
+``` csharp
 Timer.Delay(2.0f, () => Debug.Log("2秒后执行"));
-循环执行（每1秒执行一次，无限循环）
-csharp
+```
+## 循环执行（每1秒执行一次，无限循环）
+``` csharp
 Timer.Loop(1.0f, () => Debug.Log("每秒触发一次"));
-循环执行（立即执行 + 执行5次）
-csharp
+```
+## 循环执行（立即执行 + 执行5次）
+```csharp
 Timer.Loop(1.0f, MyCallback, TimerTimeSource.UnscaledTime, immediate: true, times: 5);
-API 说明
-创建定时任务
+```
+# API 说明
+## 创建定时任务
 方法	说明
 Timer.Delay(float delay, Action callback, TimerTimeSource timeSource)	延迟执行一次回调
 Timer.Loop(float interval, Action callback, TimerTimeSource timeSource, bool immediate, int times)	间隔时间循环执行回调，支持立即执行和限定次数
