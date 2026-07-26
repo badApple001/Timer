@@ -1,10 +1,8 @@
-# Timer - Unity定时任务调度系统
+# Timer — Unity 定时任务管理工具
 
 ![Unity](https://img.shields.io/badge/Unity-2021.3+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-
- # Timer — Unity 定时任务管理工具
 
 一个轻量、零配置的 Unity 定时器插件：支持一次性延迟任务与循环任务，提供三种时间源，内置对象池，并附带编辑器可视化调试面板。
 
